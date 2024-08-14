@@ -8,7 +8,7 @@ https://brasilapi.com.br/api/cep/v1/ + cep
 
 http://viacep.com.br/ws/" + cep + "/json/
 
-** ## O CEP deve ser passado como argumento ao rodar o programa (go run main.go "CEP")**
+### **O CEP deve ser passado como argumento ao rodar o programa (go run main.go "CEP")**
 
 
 Os requisitos para este desafio são:
