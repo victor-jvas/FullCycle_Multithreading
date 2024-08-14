@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -16,10 +17,6 @@ type BrasilAPIJson struct {
 	Neighborhood string `json:"neighborhood"`
 	Street       string `json:"street"`
 	Service      string `json:"service"`
-}
-
-func (cep *BrasilAPIJson) ToString() {
-
 }
 
 type ViaCepJson struct {
@@ -34,10 +31,6 @@ type ViaCepJson struct {
 	Gia         string `json:"gia"`
 	Ddd         string `json:"ddd"`
 	Siafi       string `json:"siafi"`
-}
-
-type CepJson interface {
-	ToString() string
 }
 
 func getAdrress(ch chan interface{}, url string) {
@@ -89,18 +82,20 @@ func main() {
 
 	c1 := make(chan interface{})
 	c2 := make(chan interface{})
-	url1 := "https://brasilapi.com.br/api/cep/v1/01153000"
-	url2 := "http://viacep.com.br/ws/50670350/json/"
+
+	cep := os.Args[1]
+	url1 := "https://brasilapi.com.br/api/cep/v1/" + cep
+	url2 := "http://viacep.com.br/ws/" + cep + "/json/"
 
 	go getAdrress(c2, url2)
 	go getAdrress(c1, url1)
 
 	select {
 	case result := <-c1:
-		fmt.Println("API: BrasilAPI Endereço: ", result)
+		fmt.Println("API: BrasilAPI\nEndereço: ", result)
 
 	case result := <-c2:
-		fmt.Println("API: ViaCEP Endereço: ", result)
+		fmt.Println("API: ViaCEP\nEndereço: ", result)
 
 	case <-time.After(time.Second):
 		fmt.Println("Timeout Error")
