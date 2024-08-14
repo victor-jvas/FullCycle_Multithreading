@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -15,6 +16,10 @@ type BrasilAPIJson struct {
 	Neighborhood string `json:"neighborhood"`
 	Street       string `json:"street"`
 	Service      string `json:"service"`
+}
+
+func (cep *BrasilAPIJson) ToString() {
+
 }
 
 type ViaCepJson struct {
@@ -29,6 +34,10 @@ type ViaCepJson struct {
 	Gia         string `json:"gia"`
 	Ddd         string `json:"ddd"`
 	Siafi       string `json:"siafi"`
+}
+
+type CepJson interface {
+	ToString() string
 }
 
 func getAdrress(ch chan interface{}, url string) {
@@ -50,13 +59,29 @@ func getAdrress(ch chan interface{}, url string) {
 		return
 	}
 
-	var result BrasilAPIJson
-	err = json.Unmarshal(resp, &result)
-	if err != nil {
-		fmt.Println("Erro unmarshaling json.")
+	if strings.Contains(url, "viacep") {
+
+		var result ViaCepJson
+		err = json.Unmarshal(resp, &result)
+		if err != nil {
+			fmt.Println("Erro unmarshaling json.")
+		}
+
+		ch <- result
+
 	}
 
-	ch <- result
+	if strings.Contains(url, "brasilapi") {
+
+		var result BrasilAPIJson
+		err = json.Unmarshal(resp, &result)
+		if err != nil {
+			fmt.Println("Erro unmarshaling json.")
+		}
+
+		ch <- result
+
+	}
 
 }
 
@@ -72,13 +97,13 @@ func main() {
 
 	select {
 	case result := <-c1:
-		fmt.Println("chegou", result)
+		fmt.Println("API: BrasilAPI Endereço: ", result)
 
 	case result := <-c2:
-		fmt.Println("viacep", result)
+		fmt.Println("API: ViaCEP Endereço: ", result)
 
 	case <-time.After(time.Second):
-		fmt.Println("Timeout Error :D")
+		fmt.Println("Timeout Error")
 
 	}
 
